@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Query
 import psycopg2
 from statistics import mean
 import math
@@ -26,7 +26,7 @@ timestamp_format = "%d%m%Y-%H%M"
 
 
 @app.get('/kpis', tags=['KPIs'])
-def get_kpi(type_, start_date: Union[str, None] = None, end_date: Union[str, None] = None,
+def get_kpi(type_: str = Query(..., alias="type"), start_date: Union[str, None] = None, end_date: Union[str, None] = None,
             start_time: Union[str, None] = None, end_time: Union[str, None] = None):
     kpi_request_args = {'start_date': start_date, 'type': type_, 'end_date': end_date, 'start_time': start_time,
                         'end_time': end_time}
@@ -87,7 +87,7 @@ def get_dbstart_time():
 
 
 @app.get('/bottle_trends', tags=['Bottle, No Bottle, Cans Trend'])
-def bottle_trend(type_, start_date: Union[str, None] = None, end_date: Union[str, None] = None,
+def bottle_trend(type_: str = Query(..., alias="type"), start_date: Union[str, None] = None, end_date: Union[str, None] = None,
                  start_time: Union[str, None] = None, end_time: Union[str, None] = None):
     kpi_request_args = {'start_date': start_date, 'type': type_, 'end_date': end_date, 'start_time': start_time,
                         'end_time': end_time}
@@ -141,7 +141,7 @@ def bottle_trend(type_, start_date: Union[str, None] = None, end_date: Union[str
 
 
 @app.get('/bottle_distribution', tags=['Bottle Distribution for PI charts'])
-def bottle_distribution(type_, start_date: Union[str, None] = None, end_date: Union[str, None] = None,
+def bottle_distribution(type_: str = Query(..., alias="type"), start_date: Union[str, None] = None, end_date: Union[str, None] = None,
                         start_time: Union[str, None] = None, end_time: Union[str, None] = None):
     kpi_request_args = {'start_date': start_date, 'type': type_, 'end_date': end_date, 'start_time': start_time,
                         'end_time': end_time}
@@ -190,7 +190,7 @@ def bottle_distribution(type_, start_date: Union[str, None] = None, end_date: Un
 
 
 @app.get("/food_trends", tags=['Food,  Non Food Trend'])
-def food_trend(type_, start_date: Union[str, None] = None, end_date: Union[str, None] = None,
+def food_trend(type_: str = Query(..., alias="type"), start_date: Union[str, None] = None, end_date: Union[str, None] = None,
                start_time: Union[str, None] = None, end_time: Union[str, None] = None):
     kpi_request_args = {'start_date': start_date, 'type': type_, 'end_date': end_date, 'start_time': start_time,
                         'end_time': end_time}
@@ -236,7 +236,7 @@ def food_trend(type_, start_date: Union[str, None] = None, end_date: Union[str, 
 
 
 @app.get('/food_distribution', tags=['Food, Non Food Distribution for PI charts'])
-def food_distribution(type_, start_date: Union[str, None] = None, end_date: Union[str, None] = None,
+def food_distribution(type_: str = Query(..., alias="type"), start_date: Union[str, None] = None, end_date: Union[str, None] = None,
                       start_time: Union[str, None] = None, end_time: Union[str, None] = None):
     kpi_request_args = {'start_date': start_date, 'type': type_, 'end_date': end_date, 'start_time': start_time,
                         'end_time': end_time}
@@ -278,7 +278,7 @@ def food_distribution(type_, start_date: Union[str, None] = None, end_date: Unio
 
 
 @app.get('/color_trends', tags=['Color Trend'])
-def color_trend(type_, start_date: Union[str, None] = None, end_date: Union[str, None] = None,
+def color_trend(type_: str = Query(..., alias="type"), start_date: Union[str, None] = None, end_date: Union[str, None] = None,
                 start_time: Union[str, None] = None, end_time: Union[str, None] = None):
     kpi_request_args = {'start_date': start_date, 'type': type_, 'end_date': end_date, 'start_time': start_time,
                         'end_time': end_time}
@@ -360,7 +360,7 @@ def color_trend(type_, start_date: Union[str, None] = None, end_date: Union[str,
 
 
 @app.get('/color_distribution', tags=['Color  Distribution for PI charts'])
-def color_distribution(type_, start_date: Union[str, None] = None, end_date: Union[str, None] = None,
+def color_distribution(type_: str = Query(..., alias="type"), start_date: Union[str, None] = None, end_date: Union[str, None] = None,
                        start_time: Union[str, None] = None, end_time: Union[str, None] = None):
     kpi_request_args = {'start_date': start_date, 'type': type_, 'end_date': end_date, 'start_time': start_time,
                         'end_time': end_time}
