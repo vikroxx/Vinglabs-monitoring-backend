@@ -58,7 +58,7 @@ def get_kpi(type_: str = Query(..., alias="type"), start_date: Union[str, None] 
         food_processed = sum(food_processed)
         non_food_processed = sum(non_food_processed)
         opaque_processed = sum(opaque_processed)
-        bot_per_sec = math.floor(mean(bot_per_sec))
+        bot_per_sec = round(mean(bot_per_sec), 2)
 
         if bottle_processed != 0:
             food_grade_percentage = round(food_processed / bottle_processed * 100, 2)
@@ -73,7 +73,7 @@ def get_kpi(type_: str = Query(..., alias="type"), start_date: Union[str, None] 
         "food_grade_percentage": food_grade_percentage,
         "non_food_clear": non_food_clear_percentage,
         "opaque_percentage": opaque_percentage,
-        "bottles_per_second": math.floor(bot_per_sec),
+        "bottles_per_second": bot_per_sec,
         "start_timestamp": start_timestamp,
         "end_timestamp": end_timestamp
     }
