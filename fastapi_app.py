@@ -74,15 +74,15 @@ def get_kpi(type_: str = Query(..., alias="type"), start_date: Union[str, None] 
         "non_food_clear": non_food_clear_percentage,
         "opaque_percentage": opaque_percentage,
         "bottles_per_second": bot_per_sec,
-        "start_timestamp": start_timestamp,
-        "end_timestamp": end_timestamp
+        "start_timestamp": start_timestamp.strftime(timestamp_format),
+        "end_timestamp": end_timestamp.strftime(timestamp_format)
     }
 
 
 @app.get('/dbstart_time', tags=['Database start time'])
 def get_dbstart_time():
     return {
-        'start_timestamp': '30092022-2200',
+        'start_timestamp': '29092022-2140',
     }
 
 
