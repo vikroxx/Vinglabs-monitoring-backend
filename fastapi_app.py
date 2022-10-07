@@ -7,6 +7,7 @@ from utils import get_random_color_distribution, get_random_color_trends, get_ra
     get_random_bottle_trends, parse_args, \
     get_random_bottle_distribution, get_random_food_trends, create_filter_query
 from typing import Union
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
@@ -17,17 +18,30 @@ con = psycopg2.connect(
     host="prt-prod.cmuk1jsd4tyu.ap-south-1.rds.amazonaws.com",
     port='5432'
 )
-cursor = con.cursor()
+# cursor = con.cursor()
 
 entries_per_minute = 3
 least_count = 60 // entries_per_minute
 db_table_name = 'aggregate'
 timestamp_format = "%d%m%Y-%H%M"
+timestamp_format_trends = "%d%m%Y-%H%M%S"
+
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get('/kpis', tags=['KPIs'])
-def get_kpi(type_: str = Query(..., alias="type"), start_date: Union[str, None] = None, end_date: Union[str, None] = None,
+def get_kpi(type_: str = Query(..., alias="type"), start_date: Union[str, None] = None,
+            end_date: Union[str, None] = None,
             start_time: Union[str, None] = None, end_time: Union[str, None] = None):
+    cursor = con.cursor()
     kpi_request_args = {'start_date': start_date, 'type': type_, 'end_date': end_date, 'start_time': start_time,
                         'end_time': end_time}
 
@@ -45,9 +59,13 @@ def get_kpi(type_: str = Query(..., alias="type"), start_date: Union[str, None] 
                                         'opaque_processed', 'bottle_per_sec'],
                                        db_table_name)
     print(filter_query)
-    cursor.execute(filter_query)
-    results = cursor.fetchall()
 
+    try:
+        cursor.execute(filter_query)
+    except Exception as err:
+        print(err)
+    results = cursor.fetchall()
+    print("kpi results ", results)
     if bool(results):
         bottle_processed, clear_light_blue_processed, sleeve_clear_processed, food_processed, \
         non_food_processed, opaque_processed, bot_per_sec = list(map(list, zip(*results)))
@@ -87,8 +105,11 @@ def get_dbstart_time():
 
 
 @app.get('/bottle_trends', tags=['Bottle, No Bottle, Cans Trend'])
-def bottle_trend(type_: str = Query(..., alias="type"), start_date: Union[str, None] = None, end_date: Union[str, None] = None,
+def bottle_trend(type_: str = Query(..., alias="type"), start_date: Union[str, None] = None,
+                 end_date: Union[str, None] = None,
                  start_time: Union[str, None] = None, end_time: Union[str, None] = None):
+    cursor = con.cursor()
+
     kpi_request_args = {'start_date': start_date, 'type': type_, 'end_date': end_date, 'start_time': start_time,
                         'end_time': end_time}
 
@@ -118,7 +139,7 @@ def bottle_trend(type_: str = Query(..., alias="type"), start_date: Union[str, N
         timestamps, can_values, bottle_percent, non_bottle_percent, cans_percent, \
         bot_per_sec, nobot_per_sec = list(map(list, zip(*results)))
 
-    timestamps = [timestamp.strftime(timestamp_format) for timestamp in timestamps]
+    timestamps = [timestamp.strftime(timestamp_format_trends) for timestamp in timestamps]
 
     return {
         'bottle_trend': {
@@ -141,8 +162,10 @@ def bottle_trend(type_: str = Query(..., alias="type"), start_date: Union[str, N
 
 
 @app.get('/bottle_distribution', tags=['Bottle Distribution for PI charts'])
-def bottle_distribution(type_: str = Query(..., alias="type"), start_date: Union[str, None] = None, end_date: Union[str, None] = None,
+def bottle_distribution(type_: str = Query(..., alias="type"), start_date: Union[str, None] = None,
+                        end_date: Union[str, None] = None,
                         start_time: Union[str, None] = None, end_time: Union[str, None] = None):
+    cursor = con.cursor()
     kpi_request_args = {'start_date': start_date, 'type': type_, 'end_date': end_date, 'start_time': start_time,
                         'end_time': end_time}
 
@@ -190,8 +213,10 @@ def bottle_distribution(type_: str = Query(..., alias="type"), start_date: Union
 
 
 @app.get("/food_trends", tags=['Food,  Non Food Trend'])
-def food_trend(type_: str = Query(..., alias="type"), start_date: Union[str, None] = None, end_date: Union[str, None] = None,
+def food_trend(type_: str = Query(..., alias="type"), start_date: Union[str, None] = None,
+               end_date: Union[str, None] = None,
                start_time: Union[str, None] = None, end_time: Union[str, None] = None):
+    cursor = con.cursor()
     kpi_request_args = {'start_date': start_date, 'type': type_, 'end_date': end_date, 'start_time': start_time,
                         'end_time': end_time}
 
@@ -218,7 +243,7 @@ def food_trend(type_: str = Query(..., alias="type"), start_date: Union[str, Non
         timestamps, food_values, food_percentage, nonfood_values, nonfood_percentage = list(
             map(list, zip(*results)))
 
-        timestamps = [timestamp.strftime(timestamp_format) for timestamp in timestamps]
+        timestamps = [timestamp.strftime(timestamp_format_trends) for timestamp in timestamps]
 
     return {
         'food_trend': {
@@ -236,8 +261,10 @@ def food_trend(type_: str = Query(..., alias="type"), start_date: Union[str, Non
 
 
 @app.get('/food_distribution', tags=['Food, Non Food Distribution for PI charts'])
-def food_distribution(type_: str = Query(..., alias="type"), start_date: Union[str, None] = None, end_date: Union[str, None] = None,
+def food_distribution(type_: str = Query(..., alias="type"), start_date: Union[str, None] = None,
+                      end_date: Union[str, None] = None,
                       start_time: Union[str, None] = None, end_time: Union[str, None] = None):
+    cursor = con.cursor()
     kpi_request_args = {'start_date': start_date, 'type': type_, 'end_date': end_date, 'start_time': start_time,
                         'end_time': end_time}
 
@@ -278,8 +305,10 @@ def food_distribution(type_: str = Query(..., alias="type"), start_date: Union[s
 
 
 @app.get('/color_trends', tags=['Color Trend'])
-def color_trend(type_: str = Query(..., alias="type"), start_date: Union[str, None] = None, end_date: Union[str, None] = None,
+def color_trend(type_: str = Query(..., alias="type"), start_date: Union[str, None] = None,
+                end_date: Union[str, None] = None,
                 start_time: Union[str, None] = None, end_time: Union[str, None] = None):
+    cursor = con.cursor()
     kpi_request_args = {'start_date': start_date, 'type': type_, 'end_date': end_date, 'start_time': start_time,
                         'end_time': end_time}
 
@@ -317,9 +346,9 @@ def color_trend(type_: str = Query(..., alias="type"), start_date: Union[str, No
     results = cursor.fetchall()
 
     if bool(results):
-        timestamps, clear_light_blue_values, blue_and_darks_values, green_values, opaque_values, other_values, \
-        sleeve_clear_values, clear_light_blue_percentage, blue_and_darks_percentage, green_percentage, \
-        opaque_percentage, other_percentage, sleeve_clear_percentage = list(
+        timestamps, clear_light_blue_values, blue_and_darks_values, opaque_values, other_values, \
+        sleeve_clear_values, green_values, clear_light_blue_percentage, blue_and_darks_percentage, \
+        opaque_percentage, other_percentage, sleeve_clear_percentage, green_percentage = list(
             map(list, zip(*results)))
 
         clear_light_blue_values = [x + y for x, y in zip(clear_light_blue_values, sleeve_clear_values)]
@@ -327,7 +356,7 @@ def color_trend(type_: str = Query(..., alias="type"), start_date: Union[str, No
             x + y if (x is not None and y is not None) else (x if y is None else (y if x is None else None)) for x, y in
             zip(clear_light_blue_percentage, sleeve_clear_percentage)]
 
-    timestamps = [timestamp.strftime(timestamp_format) for timestamp in timestamps]
+    timestamps = [timestamp.strftime(timestamp_format_trends) for timestamp in timestamps]
 
     return {
         'clear_light_blue_trend': {
@@ -360,8 +389,10 @@ def color_trend(type_: str = Query(..., alias="type"), start_date: Union[str, No
 
 
 @app.get('/color_distribution', tags=['Color  Distribution for PI charts'])
-def color_distribution(type_: str = Query(..., alias="type"), start_date: Union[str, None] = None, end_date: Union[str, None] = None,
+def color_distribution(type_: str = Query(..., alias="type"), start_date: Union[str, None] = None,
+                       end_date: Union[str, None] = None,
                        start_time: Union[str, None] = None, end_time: Union[str, None] = None):
+    cursor = con.cursor()
     kpi_request_args = {'start_date': start_date, 'type': type_, 'end_date': end_date, 'start_time': start_time,
                         'end_time': end_time}
 
@@ -387,8 +418,8 @@ def color_distribution(type_: str = Query(..., alias="type"), start_date: Union[
     results = cursor.fetchall()
 
     if bool(results):
-        clear_light_blue_values, blue_and_darks_values, green_values, opaque_values, other_values, \
-        sleeve_clear_values = list(map(list, zip(*results)))
+        clear_light_blue_values, blue_and_darks_values, opaque_values, other_values, \
+        sleeve_clear_values, green_values = list(map(list, zip(*results)))
 
         clear_light_blue_values = sum(clear_light_blue_values)
         sleeve_clear_values = sum(sleeve_clear_values)

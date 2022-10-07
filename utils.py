@@ -124,6 +124,17 @@ def parse_args(args):
     return request_type, start_timestamp, end_timestamp
 
 
+def parse_args_for_pdf(start_date):
+    start_time = '000000'
+    end_time = '235959'
+    end_date = start_date
+    start_timestamp = datetime.strptime(start_date + "-" + start_time, "%d%m%Y-%H%M%S")
+    end_timestamp = datetime.strptime(end_date + "-" + end_time, "%d%m%Y-%H%M%S")
+
+    # return request_type,start_date,start_time,end_date,end_time
+    return start_timestamp, end_timestamp
+
+
 def get_random_bottle_distribution():
     cans_distribution = round(random.uniform(0.1, 0.5), 2)
     bottle_distribution = random.randint(65, 99)
