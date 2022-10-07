@@ -22,7 +22,7 @@ con = psycopg2.connect(
 
 entries_per_minute = 3
 least_count = 60 // entries_per_minute
-db_table_name = 'aggregate'
+db_table_name = 'aggregate_new'
 timestamp_format = "%d%m%Y-%H%M"
 timestamp_format_trends = "%d%m%Y-%H%M%S"
 
