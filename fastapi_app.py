@@ -2,7 +2,7 @@ from fastapi import FastAPI, Query
 import psycopg2
 from statistics import mean
 import math
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from utils import get_random_color_distribution, get_random_color_trends, get_random_food_distribution, get_timestamps, \
     get_random_bottle_trends, parse_args, \
     get_random_bottle_distribution, get_random_food_trends, create_filter_query
@@ -54,7 +54,7 @@ def get_kpi(type_: str = Query(..., alias="type"), start_date: Union[str, None] 
     bot_per_sec = []
 
     filter_query = create_filter_query(start_timestamp, end_timestamp,
-                                       ['bottle_processed', 'clear_light_blue_processed',
+                                       ['datetime', 'bottle_processed', 'clear_light_blue_processed',
                                         'sleeve_clear_processed', 'food_processed', 'non_food_processed',
                                         'opaque_processed', 'bottle_per_sec'],
                                        db_table_name)
@@ -65,9 +65,9 @@ def get_kpi(type_: str = Query(..., alias="type"), start_date: Union[str, None] 
     except Exception as err:
         print(err)
     results = cursor.fetchall()
-    print("kpi results ", results)
+    # print("kpi results ", results)
     if bool(results):
-        bottle_processed, clear_light_blue_processed, sleeve_clear_processed, food_processed, \
+        timestamps, bottle_processed, clear_light_blue_processed, sleeve_clear_processed, food_processed, \
         non_food_processed, opaque_processed, bot_per_sec = list(map(list, zip(*results)))
 
         bottle_processed = sum(bottle_processed)
@@ -76,7 +76,23 @@ def get_kpi(type_: str = Query(..., alias="type"), start_date: Union[str, None] 
         food_processed = sum(food_processed)
         non_food_processed = sum(non_food_processed)
         opaque_processed = sum(opaque_processed)
-        bot_per_sec = round(mean(bot_per_sec), 2)
+
+        # print(bot_per_sec[0], timestamps[0])
+        # print(type(timestamps[-1]))
+        # print(bot_per_sec[-1], timestamps[-1].strftime(timestamp_format_trends))
+        current_datetime = datetime.now(timezone.utc) + timedelta(hours=2)
+        # print(current_datetime)
+        delta = current_datetime.replace(tzinfo=None) - timestamps[-1].replace(tzinfo=None)
+        # print(delta < timedelta(seconds=30))
+        # print(delta)
+
+        if request_type == 'filter':
+            bot_per_sec = round(mean(bot_per_sec), 2)
+        elif request_type == 'live':
+            if delta < timedelta(minutes =2):
+                bot_per_sec = round(bot_per_sec[-1], 2)
+            else:
+                bot_per_sec = []
 
         if bottle_processed != 0:
             food_grade_percentage = round(food_processed / bottle_processed * 100, 2)
