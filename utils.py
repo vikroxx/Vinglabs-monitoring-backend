@@ -114,7 +114,7 @@ def parse_args(args):
         # start_time = (current_datetime - timedelta(hours=2)).strftime("%H%M")
         # end_date = current_datetime.strftime("%d%m%Y")
         # end_time = current_datetime.strftime("%H%M")
-        start_timestamp = current_datetime - timedelta(hours=2)
+        start_timestamp = current_datetime - timedelta(minutes=90)
         end_timestamp = current_datetime
     else:
         start_timestamp = datetime.strptime(start_date + "-" + start_time, "%d%m%Y-%H%M")
@@ -166,6 +166,6 @@ def create_filter_query(start_timestamp, end_timestamp, columns_list, table_name
     start_timestamp = datetime.strftime(start_timestamp, "%Y-%m-%d %H:%M:%S")
     end_timestamp = datetime.strftime(end_timestamp, "%Y-%m-%d %H:%M:%S")
 
-    query = "SELECT " + columns + " FROM " + table_name + " where datetime BETWEEN '" + start_timestamp + "' AND '" + end_timestamp + "'"
+    query = "SELECT " + columns + " FROM " + table_name + " where datetime BETWEEN '" + start_timestamp + "' AND '" + end_timestamp + "'" + " ORDER BY datetime"
 
     return query
