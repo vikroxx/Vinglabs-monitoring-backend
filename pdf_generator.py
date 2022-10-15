@@ -1,3 +1,4 @@
+import os
 from utils import create_filter_query, parse_args_for_pdf
 import psycopg2
 from statistics import mean
@@ -5,9 +6,13 @@ from tqdm import tqdm
 import plotly.express as px
 import locale
 import plotly.graph_objects as go
+from generate_final_image import generate_final_image
+import cv2
 
 locale.setlocale(locale.LC_ALL, 'en_US')
 
+start_date = '13102022'
+note = "The system was not operational between 19:00 - 21:00"
 con = psycopg2.connect(
     database="prt-db",
     user="postgres",
@@ -17,10 +22,9 @@ con = psycopg2.connect(
 )
 cursor = con.cursor()
 
-db_table_name = 'aggregate'
+db_table_name = 'aggregate_new'
 timestamp_format = "%d%m%Y-%H%M"
 
-start_date = '04102022'
 start_timestamp, end_timestamp = parse_args_for_pdf(start_date)
 filter_query = create_filter_query(start_timestamp, end_timestamp,
                                    ['bottle_processed', 'no_bottle_processed',
@@ -28,21 +32,20 @@ filter_query = create_filter_query(start_timestamp, end_timestamp,
                                     'opaque_processed', 'bottle_per_sec'],
                                    db_table_name)
 
-print(filter_query)
 cursor.execute(filter_query)
 results = cursor.fetchall()
 
 breakpoints = [2, 15, 30]
 histogram_dist = {}
 
-breakpoints_cum = [(x + 1) * 5 for x in range(10)]
+breakpoints_cum = [(x + 1) * 5 for x in range(12)]
 cum_dist = {}
-
+print(bool(results))
 if bool(results):
     bottle_processed, no_bottle_processed, cans_processed, non_food_processed, food_processed, opaque_processed, \
     bottle_per_sec = list(map(list, zip(*results)))
 
-    bottle_per_sec = [round(x * 20 / 23, 2) for x in bottle_per_sec]
+    bottle_per_sec = [round(x, 2) for x in bottle_per_sec]
 
     print(len(bottle_processed))
     total_bottle_processed = int(sum(bottle_processed))
@@ -197,3 +200,13 @@ if bool(results):
                                              color='DarkSlateGrey')),
                        textposition='top center')
     fig3.write_image("images\\{}_cumhist.jpeg".format(start_date))
+
+    hist, pi, cumhist = cv2.imread("images\\{}_hist.jpeg".format(start_date)), cv2.imread(
+        "images\\{}_pie.jpeg".format(start_date)), cv2.imread(
+        "images\\{}_cumhist.jpeg".format(start_date))
+    generate_final_image(start_date, hist, pi, cumhist, total_bottle_processed, average_bottle_per_sec,
+                         max_bottle_per_sec, average_non_food_percentage, average_opaque_percentage, bottom_note=note)
+
+    os.remove("images\\{}_hist.jpeg".format(start_date))
+    os.remove("images\\{}_pie.jpeg".format(start_date))
+    os.remove("images\\{}_cumhist.jpeg".format(start_date))

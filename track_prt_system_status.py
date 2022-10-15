@@ -3,15 +3,14 @@ import time
 import psycopg2
 from datetime import datetime, timedelta, timezone
 
-
 db_table_name = 'aggregate_new'
 timestamp_format = "%d%m%Y-%H%M"
 timestamp_format_trends = "%d%m%Y-%H%M%S"
 
 
 def alert_message():
-    api_key = "8fcef776e875fac1a2f14ae10692d9c7-b0ed5083-da3fe118"
-    domain_name = "sandbox3de5f88518024eadbf89034a019a32df.mailgun.org"
+    api_key = "b0b0e31cdaf3fbbe40c7279c618aa4fe-b0ed5083-38ad4f33"
+    domain_name = "sandbox7294f39fc64f4e88ba8d1f0bdb4a0d5f.mailgun.org"
     # print('drawn participant :\n', text_string)
     return requests.post(
         "https://api.mailgun.net/v3/{}/messages".format(domain_name),
@@ -51,13 +50,14 @@ def main():
                     if not last_fail_time:
                         last_fail_time = fail_time
                         alert_message()
-                        print('kaand ho gaya!')
+                        print('{} : kaand ho gaya.., Current time :{} '.format(timestamps[0][0], current_datetime))
                     else:
                         if last_fail_time == fail_time:
-                            print('Already intimated!')
+                            print('Already intimated! , Current time :{}'.format(timestamps[0][0], current_datetime))
                         else:
                             alert_message()
-                            print('kaand ho gaya!')
+                            print('{} : kaand ho gaya.., Current time :{} '.format(timestamps[0][0], current_datetime))
+                            last_fail_time = fail_time
                 else:
                     print('{} : Sab changa si..'.format(timestamps[0][0]))
 
