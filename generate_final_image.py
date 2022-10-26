@@ -5,8 +5,10 @@ from datetime import datetime
 
 
 def generate_final_image(input_date, hist, pi, cumhist, bottle_processed, avg_bot_per_sec, max_bot_per_sec,
-                         avg_non_food, avg_opaque, bottom_note=None,
+                         avg_non_food, avg_opaque, bottom_note=None, info=None,
                          base_file_path=os.path.join('images', 'schema.jpg')):
+    if info == '':
+        info = None
     # base_file_path = os.path.join('images', 'schema.jpg')
     # hist_path = os.path.join('images', '13102022_hist.jpeg')
     # pi_path = os.path.join('images', '13102022_pie.jpeg')
@@ -91,6 +93,13 @@ def generate_final_image(input_date, hist, pi, cumhist, bottle_processed, avg_bo
         font = ImageFont.truetype("calibrili.ttf", 50)
         w, h = font.getsize(text)
         draw.text((2450 - w, 3450 - h), text, font=font, fill=(0, 0, 0))
+
+    text = info
+
+    if text is not None:
+        font = ImageFont.truetype("calibrib.ttf", 65)
+        w, h = font.getsize(text)
+        draw.text((2450 - w, 3350 - h), text, font=font, fill=(0, 0, 0))
 
     image.save(final_image_path)
     pdf = image.convert('RGB')
