@@ -11,12 +11,12 @@ import cv2
 
 locale.setlocale(locale.LC_ALL, 'en_US')
 
-start_date = '25102022'
+start_date = '18112022'
 # info = "The Plant was not operational from 00:40 - 15:20, ~15 Hrs."
 # info = "System was in shutdown between 07:40 to 13:40"
 # note = "(Coinciding with Plant shutdown b/w 06:00 to 15:20)"
 info = ''
-note = 'The system was not operational between 19:00 - 21:00'
+note = 'The system was not operational between 18:00 - 20:00'
 con = psycopg2.connect(
     database="prt-db",
     user="postgres",

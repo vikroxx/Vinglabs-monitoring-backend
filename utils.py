@@ -108,12 +108,17 @@ def parse_args(args):
     end_time = args['end_time']
     start_date = args['start_date']
     end_date = args['end_date']
+
     if request_type == 'live':
-        current_datetime = datetime.now(timezone.utc) + timedelta(hours=2)
         # start_date = (current_datetime - timedelta(hours=2)).strftime("%d%m%Y")
         # start_time = (current_datetime - timedelta(hours=2)).strftime("%H%M")
         # end_date = current_datetime.strftime("%d%m%Y")
         # end_time = current_datetime.strftime("%H%M")
+        current_datetime = datetime.now(timezone.utc) + timedelta(hours=2)
+        start_timestamp = current_datetime - timedelta(minutes=90)
+        end_timestamp = current_datetime
+
+        current_datetime = datetime(2022, 10, 24, 12, 0, tzinfo=timezone.utc)
         start_timestamp = current_datetime - timedelta(minutes=90)
         end_timestamp = current_datetime
     else:
