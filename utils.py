@@ -118,7 +118,7 @@ def parse_args(args):
         start_timestamp = current_datetime - timedelta(minutes=90)
         end_timestamp = current_datetime
 
-        current_datetime = datetime(2022, 10, 24, 12, 0, tzinfo=timezone.utc)
+        current_datetime = datetime(2022, 10, 25, 12, 0, tzinfo=timezone.utc)
         start_timestamp = current_datetime - timedelta(minutes=90)
         end_timestamp = current_datetime
     else:
