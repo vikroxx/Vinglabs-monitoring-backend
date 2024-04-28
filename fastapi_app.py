@@ -14,7 +14,7 @@ app = FastAPI()
 con = psycopg2.connect(
     database="prt-db",
     user="postgres",
-    password="biology12",
+    password="XXXXXXXX",
     host="prt-prod.cgmaehois3kz.ap-south-1.rds.amazonaws.com",
     port='5432'
 )
