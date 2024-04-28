@@ -28,7 +28,7 @@ def main():
             cursor = psycopg2.connect(
                 database="prt-db",
                 user="postgres",
-                password="biology12",
+                password="XXXXXXXX",
                 host="prt-prod.cmuk1jsd4tyu.ap-south-1.rds.amazonaws.com",
                 port='5432').cursor()
 
