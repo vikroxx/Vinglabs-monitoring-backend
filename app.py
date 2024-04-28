@@ -18,7 +18,7 @@ CORS(app, resources={r'/*': {'origins': '*'}})
 con = psycopg2.connect(
     database="prt-db",
     user="postgres",
-    password="biology12",
+    password="XXXXXXXXX",
     host="prt-prod.cmuk1jsd4tyu.ap-south-1.rds.amazonaws.com",
     port='5432'
 )
